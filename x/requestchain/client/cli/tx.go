@@ -6,27 +6,27 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/sdk-application-tutorial/x/nameservice/types"
+	"github.com/ltacker/request-chain/x/requestchain/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 )
 
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	nameserviceTxCmd := &cobra.Command{
+	requestchainTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Nameservice transaction subcommands",
+		Short:                      "Requestchain transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
 
-	nameserviceTxCmd.AddCommand(client.PostCommands(
+	requestchainTxCmd.AddCommand(client.PostCommands(
 		GetCmdBuyName(cdc),
 		GetCmdSetName(cdc),
 	)...)
 
-	return nameserviceTxCmd
+	return requestchainTxCmd
 }
 
 // GetCmdBuyName is the CLI command for sending a BuyName transaction

@@ -1,7 +1,7 @@
-package nameservice
+package requestchain
 
 import (
-	"github.com/cosmos/sdk-application-tutorial/x/nameservice/types"
+	"github.com/ltacker/request-chain/x/requestchain/types"
 )
 
 const (

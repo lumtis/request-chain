@@ -1,4 +1,4 @@
-package nameservice
+package requestchain
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -7,7 +7,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// query endpoints supported by the nameservice Querier
+// query endpoints supported by the requestchain Querier
 const (
 	QueryResolve = "resolve"
 	QueryWhois   = "whois"
@@ -25,7 +25,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryNames:
 			return queryNames(ctx, req, keeper)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown nameservice query endpoint")
+			return nil, sdk.ErrUnknownRequest("unknown requestchain query endpoint")
 		}
 	}
 }

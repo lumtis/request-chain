@@ -2,8 +2,8 @@ include Makefile.ledger
 all: lint install
 
 install: go.sum
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/requestd
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/testcli
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/rcd
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/rccli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
