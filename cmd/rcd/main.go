@@ -52,7 +52,7 @@ func main() {
 	server.AddCommands(ctx, cdc, rootCmd, newApp, exportAppStateAndTMValidators)
 
 	// prepare and add flags
-	executor := cli.PrepareBaseCmd(rootCmd, "NS", app.DefaultNodeHome)
+	executor := cli.PrepareBaseCmd(rootCmd, "RC", app.DefaultNodeHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)
@@ -68,15 +68,15 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		nsApp := app.NewRequestChainApp(logger, db)
-		err := nsApp.LoadHeight(height)
+		rcApp := app.NewRequestChainApp(logger, db)
+		err := rcApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
 		}
-		return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+		return rcApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	nsApp := app.NewRequestChainApp(logger, db)
+	rcApp := app.NewRequestChainApp(logger, db)
 
-	return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	return rcApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

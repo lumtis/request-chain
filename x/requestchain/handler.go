@@ -21,11 +21,6 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 // Handle a message to set name
 func handleAppendBlock(ctx sdk.Context, keeper Keeper, msg MsgAppendBlock) sdk.Result {
-	if !msg.Owner.Equals(keeper.GetOwner(ctx, msg.Name)) {
-		return sdk.ErrUnauthorized("Incorrect Owner").Result()
-	}
-	keeper.SetName(ctx, msg.Name, msg.Value)
-
 	blockHash := keeper.AppendBlock(ctx, msg.Block)
 	if blockHash == "" {
 		return sdk.ErrUnauthorized("Block already exists").Result()

@@ -26,7 +26,7 @@ func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) 
 }
 
 // Get a block from the store from its hash
-func (k Keeper) GetBlock(ctx sdk.Context, hash string) string {
+func (k Keeper) GetBlock(ctx sdk.Context, hash string) []byte {
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has([]byte(hash)) {
 		return []byte{}
@@ -41,9 +41,9 @@ func (k Keeper) AppendBlock(ctx sdk.Context, block string) string {
 	blockHash := sha256.Sum256([]byte(block))
 
 	store := ctx.KVStore(k.storeKey)
-	if !store.Has(blockHash) {
+	if !store.Has(blockHash[:]) {
 		return ""
 	}
-	store.Set(blockHash, []byte(block))
-	return string(blockHash)
+	store.Set(blockHash[:], []byte(block))
+	return string(blockHash[:])
 }
