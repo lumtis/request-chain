@@ -1,6 +1,8 @@
 package requestchain
 
 import (
+	"fmt"
+	"strconv"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -17,17 +19,22 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryGetBlockName:
 			return queryGetBlock(ctx, path[1:], req, keeper)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown requestchain query endpoint")
+			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("unknown requestchain query endpoint %v", path[0]))
 		}
 	}
 }
 
 // nolint: unparam
 func queryGetBlock(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	res := keeper.GetBlock(ctx, path[0])
+	blockIndex, err := strconv.ParseUint(path[0], 10, 64)
+	if err != nil {
+    panic(err)
+  }
+
+	res := keeper.GetBlock(ctx, blockIndex)
 
 	if len(res) == 0 {
-		return []byte{}, sdk.ErrUnknownRequest("Hash doesn't exist")
+		return []byte{}, sdk.ErrUnknownRequest(fmt.Sprintf("Index doesn't exist %v", blockIndex))
 	}
 
 	return res, nil

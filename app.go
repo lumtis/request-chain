@@ -179,7 +179,6 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 	)
 
 	// The requestchainKeeper is the Keeper from the module for this tutorial
-	// It handles interactions with the namestore
 	app.rcKeeper = requestchain.NewKeeper(
 		app.bankKeeper,
 		app.keyRC,

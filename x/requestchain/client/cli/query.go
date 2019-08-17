@@ -27,16 +27,16 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 // GetCmdResolveName queries information about a name
 func GetCmdGetBlock(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "get [hash]",
-		Short: "get hash",
+		Use:   "get [index]",
+		Short: "get index",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			hash := args[0]
+			index := args[0]
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getblock/%s", queryRoute, hash), nil)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getblock/%s", queryRoute, index), nil)
 			if err != nil {
-				fmt.Printf("could not get block - %s \n", hash)
+				fmt.Printf("could not get block - %s \nError: %s \n", index, err)
 				return nil
 			}
 

@@ -1,8 +1,8 @@
 package requestchain
 
 import (
-	"crypto/sha256"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store/list"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -26,24 +26,31 @@ func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) 
 }
 
 // Get a block from the store from its hash
-func (k Keeper) GetBlock(ctx sdk.Context, hash string) []byte {
+func (k Keeper) GetBlock(ctx sdk.Context, index uint64) []byte {
+	// Get the store as a lsit
 	store := ctx.KVStore(k.storeKey)
-	if !store.Has([]byte(hash)) {
+	list := list.NewList(k.cdc, store)
+	var block string
+
+	if list.Len() <= index {
 		return []byte{}
 	}
 
-	return store.Get([]byte(hash))
+	err := list.Get(index, &block)
+	if err != nil {
+    panic(err)
+  }
+
+	// blockString := fmt.Sprintf("%v", block)
+
+	return []byte(block)
 }
 
 // Appends a block of data and returns the hash as an index
-func (k Keeper) AppendBlock(ctx sdk.Context, block string) string {
-	// Compute sha256 hash of the block
-	blockHash := sha256.Sum256([]byte(block))
-
+func (k Keeper) AppendBlock(ctx sdk.Context, block string) {
+	// Get the store as a lsit
 	store := ctx.KVStore(k.storeKey)
-	if !store.Has(blockHash[:]) {
-		return ""
+	list := list.NewList(k.cdc, store)
+
+	list.Push(block) // []byte(block)
 	}
-	store.Set(blockHash[:], []byte(block))
-	return string(blockHash[:])
-}

@@ -67,7 +67,7 @@ func getBlockHandler(cliCtx context.CLIContext, storeBlock string) http.HandlerF
 		vars := mux.Vars(r)
 		paramType := vars[restName]
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/get/%s", storeBlock, paramType), nil)
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getblock/%s", storeBlock, paramType), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
