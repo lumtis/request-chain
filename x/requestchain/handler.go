@@ -21,7 +21,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 // Handle a message to set name
 func handleAppendBlock(ctx sdk.Context, keeper Keeper, msg MsgAppendBlock) sdk.Result {
-	keeper.AppendBlock(ctx, msg.Block)
+	newBlock := keeper.AppendBlock(ctx, msg.Block)
 
-	return sdk.Result{}
+	return sdk.Result{Data: newBlock}
 }

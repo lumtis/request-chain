@@ -10,6 +10,7 @@ import (
 // query endpoints supported by the requestchain Querier
 const (
 	QueryGetBlockName = "getblock"
+	QueryGetBlockCount = "blockcount"
 )
 
 // NewQuerier is the module level router for state queries
@@ -18,6 +19,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		switch path[0] {
 		case QueryGetBlockName:
 			return queryGetBlock(ctx, path[1:], req, keeper)
+		case QueryGetBlockCount:
+			return queryGetBlockCount(ctx, path[1:], req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest(fmt.Sprintf("unknown requestchain query endpoint %v", path[0]))
 		}
@@ -38,4 +41,9 @@ func queryGetBlock(ctx sdk.Context, path []string, req abci.RequestQuery, keeper
 	}
 
 	return res, nil
+}
+
+// nolint: unparam
+func queryGetBlockCount(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	return []byte(fmt.Sprint(keeper.GetBlockCount(ctx))), nil
 }
