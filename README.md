@@ -2,9 +2,7 @@
 
 # Request Chain
 
-Proof of Stake blockchain using Request Network protocol.
-
-
+Example of a Proof of Stake blockchain to be used for the storage layer of the Request protocol
 
 ### Message
 
@@ -15,12 +13,15 @@ type MsgAppendBlock struct {
 }
 ```
 
-
-
 ### Query
 
 ```
 type QueryGetBlock struct {
 	Hash string
+}
+```
+
+```
+type queryGetBlockCount struct {
 }
 ```
