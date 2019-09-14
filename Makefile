@@ -2,8 +2,8 @@ include Makefile.ledger
 all: lint install
 
 install: go.sum
-		GO111MODULE=on go install -tags "$(build_tags)" ./cmd/nsd
-		GO111MODULE=on go install -tags "$(build_tags)" ./cmd/nscli
+		go install $(BUILD_FLAGS) ./cmd/rcd
+		go install $(BUILD_FLAGS) ./cmd/rccli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
