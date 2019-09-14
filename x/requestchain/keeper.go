@@ -94,7 +94,7 @@ func (k Keeper) AppendBlock(ctx sdk.Context, block string) []byte {
 	list.Push(string(formatted))
 
 	// Create the index object to send
-	blockIndex = &BlockIndex{
+	blockIndex := &BlockIndex{
 		index,
 		blockTimestamp,
 	}
