@@ -22,6 +22,6 @@ type QueryGetBlock struct {
 ```
 
 ```
-type queryGetBlockCount struct {
+type QueryGetBlockCount struct {
 }
 ```
