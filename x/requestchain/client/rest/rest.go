@@ -76,6 +76,7 @@ func getBlockHandler(cliCtx context.CLIContext, storeBlock string) http.HandlerF
 
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getblock/%s", storeBlock, paramType), nil)
 		if err != nil {
+			fmt.Println(err)
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
@@ -88,6 +89,7 @@ func getBlockCountHandler(cliCtx context.CLIContext, storeBlock string) http.Han
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/blockcount", storeBlock), nil)
 		if err != nil {
+			fmt.Println(err)
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
@@ -115,31 +117,28 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
+			fmt.Println(err)
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		err = cliCtx.Codec.UnmarshalJSON(body, &m)
 
 		if err != nil {
+			fmt.Println(err)
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-
-		// Get the sequence number of the account
-		// baseAccount := auth.NewBaseAccountWithAddress(sdk.AccAddress(m.Address))
-		// accountRetriever := authtypes.NewAccountRetriever(cliCtx)
-		// account, _ := accountRetriever.GetAccount(sdk.AccAddress(m.Address))
-		// seq, _ := account.GetSequence()
-
 		key, err := sdk.AccAddressFromBech32(m.Address)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			fmt.Println(err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 		acc, err := cliCtx.GetAccount(key)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			fmt.Println(err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 		seq := acc.GetSequence()
@@ -154,6 +153,8 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			Memo:          m.Tx.GetMemo(),
 		})
 		if err != nil {
+			fmt.Println(err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
