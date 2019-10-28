@@ -115,6 +115,8 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var m MessageBody
 
+		fmt.Println("Broadcast called")
+
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			fmt.Println(err)
@@ -143,6 +145,8 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 		seq := acc.GetSequence()
 
+		fmt.Println("Signing transaction")
+
 		// Sign
 		stdSignature, err := MakeSignature(m.LocalAccountName, m.Password, auth.StdSignMsg{
 			ChainID:       m.ChainID,
@@ -161,6 +165,8 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		sigs := []auth.StdSignature{stdSignature}
 
 		signedStdTx := auth.NewStdTx(m.Tx.GetMsgs(), m.Tx.Fee, sigs, m.Tx.GetMemo())
+
+		fmt.Println("Encoding block")
 
 		encoder := utils.GetTxEncoder(cliCtx.Codec)
 		txToBroadcast, err := encoder(signedStdTx)
