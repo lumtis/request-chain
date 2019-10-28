@@ -186,6 +186,8 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		fmt.Println("Block has been broadcasted")
+
 		// Send block record
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
