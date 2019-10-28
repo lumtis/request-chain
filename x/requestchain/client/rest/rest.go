@@ -170,6 +170,8 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		fmt.Println("Broadcasting block")
+
 		// broadcast to a Tendermint node
 		res, err := cliCtx.BroadcastTxCommit(txToBroadcast)
 		if err != nil {
