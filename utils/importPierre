@@ -1,0 +1,5 @@
+set timeout 5
+spawn rccli keys import perrine keysfilePerrine
+expect "Enter passphrase to decrypt your key:\r"
+send -- "hahahaha\r"
+expect eof

@@ -25,3 +25,9 @@ type QueryGetBlock struct {
 type QueryGetBlockCount struct {
 }
 ```
+
+### Others
+
+Account used:
+pierre: cosmos1en2n7qy77su9c8uw8hgecvfg8czdrfpu2x5qxl
+perrine: cosmos1vfpdz6wpyq7f6qw843t2qehqmf42f2fuc7u9n3

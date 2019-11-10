@@ -4,7 +4,7 @@
   "consensus_params": {
     "block": {
       "max_bytes": "22020096",
-      "max_gas": "-1",
+      "max_gas": "1000000",
       "time_iota_ms": "1000"
     },
     "evidence": {
@@ -29,6 +29,22 @@
         ],
         "sequence_number": "0",
         "account_number": "0",
+        "original_vesting": [],
+        "delegated_free": [],
+        "delegated_vesting": [],
+        "start_time": "0",
+        "end_time": "0"
+      },
+      {
+        "address": "cosmos1vfpdz6wpyq7f6qw843t2qehqmf42f2fuc7u9n3",
+        "coins": [
+          {
+            "denom": "stake",
+            "amount": "0"
+          }
+        ],
+        "sequence_number": "0",
+        "account_number": "1",
         "original_vesting": [],
         "delegated_free": [],
         "delegated_vesting": [],
