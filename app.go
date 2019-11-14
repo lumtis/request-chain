@@ -221,10 +221,9 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(
-		auth.NewAnteHandler(
+		requestchain.CustomAnteHandler(
 			app.accountKeeper,
 			app.feeCollectionKeeper,
-			auth.DefaultSigVerificationGasConsumer,
 		),
 	)
 
