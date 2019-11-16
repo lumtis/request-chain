@@ -15,7 +15,7 @@ import (
 // Custom anteHandler to consider fee from block size
 func CustomAnteHandler(ak auth.AccountKeeper) sdk.AnteHandler {
 
-	
+
 	return func(
 		ctx sdk.Context, tx sdk.Tx, sim bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
@@ -25,10 +25,10 @@ func CustomAnteHandler(ak auth.AccountKeeper) sdk.AnteHandler {
 		// 	fmt.Println("invalid tx type") // sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
 		// 	return ctx, sdk.Result{}, true
 		// }
-		fmt.Println("tx size to consume: %v", len(ctx.TxBytes()))
-		
+
 
 		params := ak.GetParams(ctx)
+		fmt.Println("tx size to consume: ", len(ctx.TxBytes()))
 		ctx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(ctx.TxBytes())), "txSize")
 
 		// TODO: Implement simulate
