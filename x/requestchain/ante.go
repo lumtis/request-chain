@@ -1,7 +1,7 @@
 package requestchain
 
 import (
-	// "fmt"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -25,6 +25,9 @@ func CustomAnteHandler(ak auth.AccountKeeper) sdk.AnteHandler {
 		// 	fmt.Println("invalid tx type") // sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
 		// 	return ctx, sdk.Result{}, true
 		// }
+		fmt.Println("tx size to consume: %v", len(ctx.TxBytes()))
+		
+
 		params := ak.GetParams(ctx)
 		ctx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(ctx.TxBytes())), "txSize")
 
