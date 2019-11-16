@@ -224,6 +224,8 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 		requestchain.CustomAnteHandler(
 			app.accountKeeper,
 			app.feeCollectionKeeper,
+			app.supplyKeeper,
+			auth.DefaultSigVerificationGasConsumer,
 		),
 	)
 
