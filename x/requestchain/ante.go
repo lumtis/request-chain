@@ -28,7 +28,7 @@ func CustomAnteHandler(ak auth.AccountKeeper) sdk.AnteHandler {
 
 
 		params := ak.GetParams(ctx)
-		fmt.Println("tx size to consume: ", params.TxSizeCostPerByte)
+		fmt.Println("tx size to consume: ", sdk.Gas(len(ctx.TxBytes())))
 		ctx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(ctx.TxBytes())), "txSize")
 
 		// TODO: Implement simulate
