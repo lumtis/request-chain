@@ -1,6 +1,6 @@
 module github.com/ltacker/request-chain
 
-go 1.12
+go 1.13
 
 require (
 	github.com/cosmos/cosmos-sdk v0.28.2-0.20190616100639-18415eedaf25
