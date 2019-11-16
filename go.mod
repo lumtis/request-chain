@@ -1,21 +1,14 @@
 module github.com/ltacker/request-chain
 
-go 1.12
+go 1.13
 
 require (
-	github.com/cosmos/cosmos-sdk v0.28.2-0.20190616100639-18415eedaf25
-	github.com/gorilla/mux v1.7.0
-	github.com/mattn/go-isatty v0.0.7 // indirect
-	github.com/prometheus/procfs v0.0.0-20190328153300-af7bedc223fb // indirect
-	github.com/spf13/afero v1.2.2 // indirect
-	github.com/spf13/cobra v0.0.3
-	github.com/spf13/viper v1.0.3
-	github.com/syndtr/goleveldb v1.0.0 // indirect
-	github.com/tendermint/go-amino v0.15.0
-	github.com/tendermint/tendermint v0.31.5
-	golang.org/x/sys v0.0.0-20190329044733-9eb1bfa1ce65 // indirect
-	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
-	google.golang.org/grpc v1.19.1 // indirect
+	github.com/cosmos/cosmos-sdk v0.37.4
+	github.com/gorilla/mux v1.7.3
+	github.com/spf13/cobra v0.0.5
+	github.com/spf13/viper v1.5.0
+	github.com/stretchr/testify v1.4.0
+	github.com/tendermint/go-amino v0.15.1
+	github.com/tendermint/tendermint v0.32.7
+	github.com/tendermint/tm-db v0.2.0
 )
-
-replace golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5
