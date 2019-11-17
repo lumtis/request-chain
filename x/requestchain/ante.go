@@ -33,36 +33,36 @@ func CustomAnteHandler(ak auth.AccountKeeper, fck auth.FeeCollectionKeeper) sdk.
 			return ctx, sdk.ErrInternal("tx must be StdTx").Result(), true
 		}
 
+		newCtx = auth.SetGasMeter(sim, ctx, 200000)
+
     // Consume gas
-		params := ak.GetParams(ctx)
-		cost := params.TxSizeCostPerByte*sdk.Gas(len(ctx.TxBytes()))
-		ctx.GasMeter().ConsumeGas(cost, "txSize")
+		params := ak.GetParams(newCtx)
+		cost := params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes()))
+		newCtx.GasMeter().ConsumeGas(cost, "txSize")
 
 		// Get account
-		signerAcc, res := auth.GetSignerAcc(ctx, ak, stdTx.GetSigners()[0])
+		signerAcc, res := auth.GetSignerAcc(newCtx, ak, stdTx.GetSigners()[0])
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
 
 		// Deduct fee
-		blockTime := ctx.BlockHeader().Time
+		blockTime := newCtx.BlockHeader().Time
 		coins := signerAcc.GetCoins()
 
 		costCoin := sdk.NewInt64Coin("stake", int64(cost))
 		fee := sdk.Coins([]sdk.Coin{costCoin})
 
-
-
 		if !fee.IsValid() {
       // sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fee)
-			return ctx, sdk.ErrInternal(fmt.Sprintf("invalid fee amount: %s", fee)).Result(), true
+			return newCtx, sdk.ErrInternal(fmt.Sprintf("invalid fee amount: %s", fee)).Result(), true
 		}
 
 		// verify the account has enough funds to pay for fee
 		_, hasNeg := coins.SafeSub(fee)
 		if hasNeg {
       // sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fee; %s < %s", coins, fee)
-			return ctx, sdk.ErrInternal(fmt.Sprintf("insufficient funds to pay for fee; %s < %s", coins, fee)).Result(), true
+			return newCtx, sdk.ErrInternal(fmt.Sprintf("insufficient funds to pay for fee; %s < %s", coins, fee)).Result(), true
 		}
 
 		// Validate the account has enough "spendable" coins as this will cover cases
@@ -70,7 +70,7 @@ func CustomAnteHandler(ak auth.AccountKeeper, fck auth.FeeCollectionKeeper) sdk.
 		spendableCoins := signerAcc.SpendableCoins(blockTime)
 		if _, hasNeg := spendableCoins.SafeSub(fee); hasNeg {
 			// sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fee; %s < %s", spendableCoins, fee)
-			return ctx, sdk.ErrInternal(fmt.Sprintf("insufficient spendable funds to pay for fee; %s < %s", spendableCoins, fee)).Result(), true
+			return newCtx, sdk.ErrInternal(fmt.Sprintf("insufficient spendable funds to pay for fee; %s < %s", spendableCoins, fee)).Result(), true
 		}
 
 		// the first signer pays the transaction fees
@@ -78,8 +78,8 @@ func CustomAnteHandler(ak auth.AccountKeeper, fck auth.FeeCollectionKeeper) sdk.
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
-		fck.AddCollectedFees(ctx, fee)
+		fck.AddCollectedFees(newCtx, fee)
 
-		return ctx, sdk.Result{}, false
+		return newCtx, sdk.Result{GasWanted: cost}, false
 	}
 }
