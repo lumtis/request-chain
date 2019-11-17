@@ -24,7 +24,7 @@
         "coins": [
           {
             "denom": "stake",
-            "amount": "100000000"
+            "amount": "1000000000"
           }
         ],
         "sequence_number": "0",
