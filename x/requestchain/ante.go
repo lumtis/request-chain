@@ -35,9 +35,27 @@ func CustomAnteHandler(ak auth.AccountKeeper, fck auth.FeeCollectionKeeper) sdk.
 
 		newCtx = auth.SetGasMeter(sim, ctx, 200000)
 
-    // Consume gas
+		// Compute cost
 		params := ak.GetParams(newCtx)
 		cost := params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes()))
+
+		// Defer
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case sdk.ErrorOutOfGas:
+					log := fmt.Sprintf("out of gas in location: %v", rType.Descriptor)
+					res = sdk.ErrOutOfGas(log).Result()
+					res.GasWanted = 200000
+					res.GasUsed = newCtx.GasMeter().GasConsumed()
+					abort = true
+				default:
+					panic(r)
+				}
+			}
+		}()
+
+    // Consume gas
 		newCtx.GasMeter().ConsumeGas(cost, "txSize")
 
 		// Get account
@@ -79,6 +97,8 @@ func CustomAnteHandler(ak auth.AccountKeeper, fck auth.FeeCollectionKeeper) sdk.
 			return newCtx, res, true
 		}
 		fck.AddCollectedFees(newCtx, fee)
+
+		ak.SetAccount(newCtx, signerAcc)
 
 		return newCtx, sdk.Result{GasWanted: cost}, false
 	}
