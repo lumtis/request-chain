@@ -2,7 +2,6 @@ package requestchain
 
 import (
 	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	// "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -13,7 +12,7 @@ import (
 // auth.NewAnteHandler(ak, sk, sgc);
 
 // Custom anteHandler to consider fee from block size
-func CustomAnteHandler(ak auth.AccountKeeper) sdk.AnteHandler {
+func CustomAnteHandler(ak auth.AccountKeeper, fck auth.FeeCollectionKeeper) sdk.AnteHandler {
 
 
 	return func(
@@ -26,47 +25,60 @@ func CustomAnteHandler(ak auth.AccountKeeper) sdk.AnteHandler {
 		// 	return ctx, sdk.Result{}, true
 		// }
 
-
-		params := ak.GetParams(ctx)
-		fmt.Println("tx size to consume: ", sdk.Gas(len(ctx.TxBytes())))
-		ctx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(ctx.TxBytes())), "txSize")
-
 		// TODO: Implement simulate
-		// // simulate gas cost for signatures in simulate mode
-		// if sim {
-		// 	// in simulate mode, each element should be a nil signature
-		// 	sigs := sigTx.GetSignatures()
-		// 	for i, signer := range sigTx.GetSigners() {
-		// 		// if signature is already filled in, no need to simulate gas cost
-		// 		if sigs[i] != nil {
-		// 			continue
-		// 		}
-		// 		acc := ak.GetAccount(ctx, signer)
+		// https://github.com/cosmos/cosmos-sdk/blob/28347bf5f7369a8ee1673c19be51f723b686b650/x/auth/ante/basic.go
 
-		// 		var pubkey crypto.PubKey
-		// 		// use placeholder simSecp256k1Pubkey if sig is nil
-		// 		if acc == nil || acc.GetPubKey() == nil {
-		// 			pubkey = simSecp256k1Pubkey
-		// 		} else {
-		// 			pubkey = acc.GetPubKey()
-		// 		}
-		// 		// use stdsignature to mock the size of a full signature
-		// 		simSig := types.StdSignature{
-		// 			Signature: simSecp256k1Sig[:],
-		// 			PubKey:    pubkey,
-		// 		}
-		// 		sigBz := types.ModuleCdc.MustMarshalBinaryLengthPrefixed(simSig)
-		// 		cost := sdk.Gas(len(sigBz) + 6)
+		stdTx, ok := tx.(auth.StdTx)
+		if !ok {
+			return ctx, sdk.ErrInternal("tx must be StdTx").Result(), true
+		}
 
-		// 		// If the pubkey is a multi-signature pubkey, then we estimate for the maximum
-		// 		// number of signers.
-		// 		if _, ok := pubkey.(multisig.PubKeyMultisigThreshold); ok {
-		// 			cost *= params.TxSigLimit
-		// 		}
+    // Consume gas
+		params := ak.GetParams(ctx)
+		cost := params.TxSizeCostPerByte*sdk.Gas(len(ctx.TxBytes()))
+		ctx.GasMeter().ConsumeGas(cost, "txSize")
 
-		// 		ctx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*cost, "txSize")
-		// 	}
-		// }
+		// Get account
+		signerAcc, res := auth.GetSignerAcc(ctx, ak, stdTx.GetSigners()[0])
+		if !res.IsOK() {
+			return newCtx, res, true
+		}
+
+		// Deduct fee
+		blockTime := ctx.BlockHeader().Time
+		coins := signerAcc.GetCoins()
+
+		costCoin := sdk.NewInt64Coin("stake", int64(cost))
+		fee := sdk.Coins([]sdk.Coin{costCoin})
+
+
+
+		if !fee.IsValid() {
+      // sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fee)
+			return ctx, sdk.ErrInternal(fmt.Sprintf("invalid fee amount: %s", fee)).Result(), true
+		}
+
+		// verify the account has enough funds to pay for fee
+		_, hasNeg := coins.SafeSub(fee)
+		if hasNeg {
+      // sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fee; %s < %s", coins, fee)
+			return ctx, sdk.ErrInternal(fmt.Sprintf("insufficient funds to pay for fee; %s < %s", coins, fee)).Result(), true
+		}
+
+		// Validate the account has enough "spendable" coins as this will cover cases
+		// such as vesting accounts.
+		spendableCoins := signerAcc.SpendableCoins(blockTime)
+		if _, hasNeg := spendableCoins.SafeSub(fee); hasNeg {
+			// sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fee; %s < %s", spendableCoins, fee)
+			return ctx, sdk.ErrInternal(fmt.Sprintf("insufficient spendable funds to pay for fee; %s < %s", spendableCoins, fee)).Result(), true
+		}
+
+		// the first signer pays the transaction fees
+		signerAcc, res = auth.DeductFees(blockTime, signerAcc, auth.NewStdFee(200000, fee))
+		if !res.IsOK() {
+			return newCtx, res, true
+		}
+		fck.AddCollectedFees(ctx, fee)
 
 		return ctx, sdk.Result{}, false
 	}
