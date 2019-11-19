@@ -35,3 +35,9 @@ docker-compose up
 ```
 
 Then, you can create and update request with [request-client.js](https://github.com/RequestNetwork/requestNetwork/tree/master/packages/request-client.js) to the node running on `localhost:3000`
+
+
+### TODO
+
+- Update to Cosmos SDK latest version
+- Implement Pegzone for ERC20 to allows usage of the REQ token to pay fees
