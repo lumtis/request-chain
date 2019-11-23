@@ -40,4 +40,4 @@ Then, you can create and update request with [request-client.js](https://github.
 ### TODO
 
 - Update to Cosmos SDK latest version
-- Implement Pegzone for ERC20 to allows usage of the REQ token to pay fees
+- Implement Pegzone for ERC20 to allows usage of the REQ token to pay fees (https://github.com/cosmos/peggy)
