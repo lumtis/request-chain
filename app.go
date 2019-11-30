@@ -6,22 +6,23 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
-	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/genaccounts"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/genaccounts"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ltacker/request-chain/x/requestchain"
 )
 
@@ -45,7 +46,17 @@ var (
 		staking.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		slashing.AppModuleBasic{},
+		supply.AppModuleBasic{},
+
+		requestchain.AppModule{},
 	)
+	// account permissions
+	maccPerms = map[string][]string{
+		auth.FeeCollectorName:     nil,
+		distr.ModuleName:          nil,
+		staking.BondedPoolName:    {supply.Burner, supply.Staking},
+		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
+	}
 )
 
 // MakeCodec generates the necessary codecs for Amino
@@ -62,17 +73,8 @@ type requestChainApp struct {
 	cdc *codec.Codec
 
 	// Keys to access the substores
-	keyMain          *sdk.KVStoreKey
-	keyAccount       *sdk.KVStoreKey
-	keyFeeCollection *sdk.KVStoreKey
-	keyStaking       *sdk.KVStoreKey
-	tkeyStaking      *sdk.TransientStoreKey
-	keyDistr         *sdk.KVStoreKey
-	tkeyDistr        *sdk.TransientStoreKey
-	keyRC            *sdk.KVStoreKey
-	keyParams        *sdk.KVStoreKey
-	tkeyParams       *sdk.TransientStoreKey
-	keySlashing      *sdk.KVStoreKey
+	keys  map[string]*sdk.KVStoreKey
+	tkeys map[string]*sdk.TransientStoreKey
 
 	// Keepers
 	accountKeeper       auth.AccountKeeper
@@ -80,7 +82,7 @@ type requestChainApp struct {
 	stakingKeeper       staking.Keeper
 	slashingKeeper      slashing.Keeper
 	distrKeeper         distr.Keeper
-	feeCollectionKeeper auth.FeeCollectionKeeper
+	supplyKeeper   			supply.Keeper
 	paramsKeeper        params.Keeper
 	rcKeeper            requestchain.Keeper
 
@@ -97,26 +99,21 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 	// BaseApp handles interactions with Tendermint through the ABCI protocol
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc))
 
+	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, requestchain.StoreKey)
+
+	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
+
 	// Here you initialize your application with the store keys it requires
 	var app = &requestChainApp{
 		BaseApp: bApp,
 		cdc:     cdc,
-
-		keyMain:          sdk.NewKVStoreKey(bam.MainStoreKey),
-		keyAccount:       sdk.NewKVStoreKey(auth.StoreKey),
-		keyFeeCollection: sdk.NewKVStoreKey(auth.FeeStoreKey),
-		keyStaking:       sdk.NewKVStoreKey(staking.StoreKey),
-		tkeyStaking:      sdk.NewTransientStoreKey(staking.TStoreKey),
-		keyDistr:         sdk.NewKVStoreKey(distr.StoreKey),
-		tkeyDistr:        sdk.NewTransientStoreKey(distr.TStoreKey),
-		keyRC:            sdk.NewKVStoreKey(requestchain.StoreKey),
-		keyParams:        sdk.NewKVStoreKey(params.StoreKey),
-		tkeyParams:       sdk.NewTransientStoreKey(params.TStoreKey),
-		keySlashing:      sdk.NewKVStoreKey(slashing.StoreKey),
+		keys:    keys,
+		tkeys:   tkeys,
 	}
 
 	// The ParamsKeeper handles parameter storage for the application
-	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams, app.tkeyParams, params.DefaultCodespace)
+	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
 	// Set specific supspaces
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
 	bankSupspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
@@ -127,7 +124,7 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 	// The AccountKeeper handles address -> account lookups
 	app.accountKeeper = auth.NewAccountKeeper(
 		app.cdc,
-		app.keyAccount,
+		keys[auth.StoreKey],
 		authSubspace,
 		auth.ProtoBaseAccount,
 	)
@@ -137,34 +134,42 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 		app.accountKeeper,
 		bankSupspace,
 		bank.DefaultCodespace,
+		app.ModuleAccountAddrs(),
 	)
 
-	// The FeeCollectionKeeper collects transaction fees and renders them to the fee distribution module
-	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(cdc, app.keyFeeCollection)
+	// The SupplyKeeper collects transaction fees and renders them to the fee distribution module
+	app.supplyKeeper = supply.NewKeeper(
+		app.cdc,
+		keys[supply.StoreKey],
+		app.accountKeeper,
+		app.bankKeeper,
+		maccPerms,
+	)
 
 	// The staking keeper
 	stakingKeeper := staking.NewKeeper(
 		app.cdc,
-		app.keyStaking,
-		app.tkeyStaking,
-		app.bankKeeper,
+		keys[staking.StoreKey],
+		tkeys[staking.TStoreKey],
+		app.supplyKeeper,
 		stakingSubspace,
 		staking.DefaultCodespace,
 	)
 
 	app.distrKeeper = distr.NewKeeper(
 		app.cdc,
-		app.keyDistr,
+		keys[distr.StoreKey],
 		distrSubspace,
-		app.bankKeeper,
 		&stakingKeeper,
-		app.feeCollectionKeeper,
+		app.supplyKeeper,
 		distr.DefaultCodespace,
+		auth.FeeCollectorName,
+		app.ModuleAccountAddrs(),
 	)
 
 	app.slashingKeeper = slashing.NewKeeper(
 		app.cdc,
-		app.keySlashing,
+		keys[slashing.StoreKey],
 		&stakingKeeper,
 		slashingSubspace,
 		slashing.DefaultCodespace,
@@ -181,25 +186,28 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 	// The requestchainKeeper is the Keeper from the module for this tutorial
 	app.rcKeeper = requestchain.NewKeeper(
 		app.bankKeeper,
-		app.keyRC,
+		keys[requestchain.StoreKey],
 		app.cdc,
 	)
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
-		auth.NewAppModule(app.accountKeeper, app.feeCollectionKeeper),
+		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		requestchain.NewAppModule(app.rcKeeper, app.bankKeeper),
-		distr.NewAppModule(app.distrKeeper),
+		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
+		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
-		staking.NewAppModule(app.stakingKeeper, app.feeCollectionKeeper, app.distrKeeper, app.accountKeeper),
+		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
 	app.mm.SetOrderEndBlockers(staking.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
+	// NOTE: The genutils moodule must occur after staking so that pools are
+	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
 		genaccounts.ModuleName,
 		distr.ModuleName,
@@ -208,6 +216,7 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 		bank.ModuleName,
 		slashing.ModuleName,
 		requestchain.ModuleName,
+		supply.ModuleName,
 		genutil.ModuleName,
 	)
 
@@ -221,24 +230,14 @@ func NewRequestChainApp(logger log.Logger, db dbm.DB) *requestChainApp {
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(
-		requestchain.CustomAnteHandler(app.accountKeeper, app.feeCollectionKeeper),
+		requestchain.CustomAnteHandler(app.accountKeeper, app.supplyKeeper),
 	)
 
-	app.MountStores(
-		app.keyMain,
-		app.keyAccount,
-		app.keyFeeCollection,
-		app.keyStaking,
-		app.tkeyStaking,
-		app.keyDistr,
-		app.tkeyDistr,
-		app.keySlashing,
-		app.keyRC,
-		app.keyParams,
-		app.tkeyParams,
-	)
+	// initialize stores
+	app.MountKVStores(keys)
+	app.MountTransientStores(tkeys)
 
-	err := app.LoadLatestVersion(app.keyMain)
+	err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
@@ -271,7 +270,17 @@ func (app *requestChainApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock
 	return app.mm.EndBlock(ctx, req)
 }
 func (app *requestChainApp) LoadHeight(height int64) error {
-	return app.LoadVersion(height, app.keyMain)
+	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
+}
+
+// ModuleAccountAddrs returns all the app's module account addresses.
+func (app *requestChainApp) ModuleAccountAddrs() map[string]bool {
+	modAccAddrs := make(map[string]bool)
+	for acc := range maccPerms {
+		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
+	}
+
+	return modAccAddrs
 }
 
 //_________________________________________________________

@@ -34,7 +34,7 @@ func GetCmdAppendBlock(cdc *codec.Codec) *cobra.Command {
 		Short: "append a block",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
@@ -43,8 +43,6 @@ func GetCmdAppendBlock(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			cliCtx.PrintResponse = true
 
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},

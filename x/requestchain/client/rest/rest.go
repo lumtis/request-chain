@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	// authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/gorilla/mux"
 )
@@ -131,13 +131,8 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		key, err := sdk.AccAddressFromBech32(m.Address)
-		if err != nil {
-			fmt.Println(err)
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		acc, err := cliCtx.GetAccount(key)
+		accountRetriever := authtypes.NewAccountRetriever(cliCtx)
+		acc, err := accountRetriever.GetAccount(sdk.AccAddress(m.Address))
 		if err != nil {
 			fmt.Println(err)
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
