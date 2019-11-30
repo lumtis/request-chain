@@ -100,7 +100,7 @@
     "genutil": {
       "gentxs": [
         {
-          "type": "auth/StdTx",
+          "type": "cosmos-sdk/StdTx",
           "value": {
             "msg": [
               {
