@@ -132,7 +132,14 @@ func broadcastHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		accountRetriever := authtypes.NewAccountRetriever(cliCtx)
-		acc, err := accountRetriever.GetAccount(sdk.AccAddress(m.Address))
+		accAddress, err := sdk.AccAddressFromBech32(m.Address)
+		if err != nil {
+			fmt.Println(err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		acc, err := accountRetriever.GetAccount(accAddress)
 		if err != nil {
 			fmt.Println(err)
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
