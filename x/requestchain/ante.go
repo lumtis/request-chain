@@ -4,7 +4,7 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	// "github.com/cosmos/cosmos-sdk/x/auth/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	// "github.com/tendermint/tendermint/crypto"
 	// "github.com/tendermint/tendermint/crypto/multisig"
 )
@@ -12,7 +12,7 @@ import (
 // auth.NewAnteHandler(ak, sk, sgc);
 
 // Custom anteHandler to consider fee from block size
-func CustomAnteHandler(ak auth.AccountKeeper, fck auth.FeeCollectionKeeper) sdk.AnteHandler {
+func CustomAnteHandler(ak auth.AccountKeeper, supplyKeeper authtypes.SupplyKeeper) sdk.AnteHandler {
 
 
 	return func(
@@ -92,11 +92,15 @@ func CustomAnteHandler(ak auth.AccountKeeper, fck auth.FeeCollectionKeeper) sdk.
 		}
 
 		// the first signer pays the transaction fees
-		signerAcc, res = auth.DeductFees(blockTime, signerAcc, auth.NewStdFee(200000, fee))
+		res = auth.DeductFees(supplyKeeper, newCtx, signerAcc, fee)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
-		fck.AddCollectedFees(newCtx, fee)
+
+		err := supplyKeeper.SendCoinsFromAccountToModule(newCtx, signerAcc.GetAddress(), authtypes.FeeCollectorName, fee)
+		if err != nil {
+			return newCtx, sdk.ErrInternal(fmt.Sprintf("insufficient spendable funds to pay for fee")).Result(), true
+		}
 
 		ak.SetAccount(newCtx, signerAcc)
 

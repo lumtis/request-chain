@@ -1,10 +1,10 @@
 {
-  "genesis_time": "2019-09-28T09:19:13.998191Z",
+  "genesis_time": "2019-11-30T15:06:23.322776Z",
   "chain_id": "wacken",
   "consensus_params": {
     "block": {
       "max_bytes": "22020096",
-      "max_gas": "1000000",
+      "max_gas": "-1",
       "time_iota_ms": "1000"
     },
     "evidence": {
@@ -18,40 +18,6 @@
   },
   "app_hash": "",
   "app_state": {
-    "accounts": [
-      {
-        "address": "cosmos1en2n7qy77su9c8uw8hgecvfg8czdrfpu2x5qxl",
-        "coins": [
-          {
-            "denom": "stake",
-            "amount": "1000000000"
-          }
-        ],
-        "sequence_number": "0",
-        "account_number": "0",
-        "original_vesting": [],
-        "delegated_free": [],
-        "delegated_vesting": [],
-        "start_time": "0",
-        "end_time": "0"
-      },
-      {
-        "address": "cosmos1vfpdz6wpyq7f6qw843t2qehqmf42f2fuc7u9n3",
-        "coins": [
-          {
-            "denom": "stake",
-            "amount": "1000000000"
-          }
-        ],
-        "sequence_number": "0",
-        "account_number": "1",
-        "original_vesting": [],
-        "delegated_free": [],
-        "delegated_vesting": [],
-        "start_time": "0",
-        "end_time": "0"
-      }
-    ],
     "slashing": {
       "params": {
         "max_evidence_age": "120000000000",
@@ -64,43 +30,10 @@
       "signing_infos": {},
       "missed_blocks": {}
     },
-    "bank": {
-      "send_enabled": true
-    },
-    "staking": {
-      "pool": {
-        "not_bonded_tokens": "0",
-        "bonded_tokens": "0"
-      },
-      "params": {
-        "unbonding_time": "259200000000000",
-        "max_validators": 100,
-        "max_entries": 7,
-        "bond_denom": "stake"
-      },
-      "last_total_power": "0",
-      "last_validator_powers": null,
-      "validators": null,
-      "delegations": null,
-      "unbonding_delegations": null,
-      "redelegations": null,
-      "exported": false
-    },
-    "params": null,
-    "auth": {
-      "collected_fees": [],
-      "params": {
-        "max_memo_characters": "256",
-        "tx_sig_limit": "7",
-        "tx_size_cost_per_byte": "10",
-        "sig_verify_cost_ed25519": "590",
-        "sig_verify_cost_secp256k1": "1000"
-      }
-    },
     "genutil": {
       "gentxs": [
         {
-          "type": "auth/StdTx",
+          "type": "cosmos-sdk/StdTx",
           "value": {
             "msg": [
               {
@@ -118,9 +51,9 @@
                     "max_change_rate": "0.010000000000000000"
                   },
                   "min_self_delegation": "1",
-                  "delegator_address": "cosmos1en2n7qy77su9c8uw8hgecvfg8czdrfpu2x5qxl",
-                  "validator_address": "cosmosvaloper1en2n7qy77su9c8uw8hgecvfg8czdrfpu0jq42v",
-                  "pubkey": "cosmosvalconspub1zcjduepqfamevsy4edju5fzrxv3tng9waadqmnktqw3taz5geavwg46trhtqjfvhec",
+                  "delegator_address": "cosmos173renhx6vx5fazhqyz5hjj7nfecpa450gyskwd",
+                  "validator_address": "cosmosvaloper173renhx6vx5fazhqyz5hjj7nfecpa450dsyrz7",
+                  "pubkey": "cosmosvalconspub1zcjduepq4n5sus2mxtfue3uglcqdpr5nryx62caf6y36s0kwvhpzm9s86euspthtuc",
                   "value": {
                     "denom": "stake",
                     "amount": "100000000"
@@ -136,18 +69,75 @@
               {
                 "pub_key": {
                   "type": "tendermint/PubKeySecp256k1",
-                  "value": "A8n2FF6+qsic5qoB1V3hPmRgXQ+Dzpu+B/mEUvlUOmbI"
+                  "value": "AupYfNZibKCymp0aY6Wev+FFYc5RBayCL4JmKJs7yb1a"
                 },
-                "signature": "FqTxnm1U6Pe48XEZDKTDJXs8gevrOQfILzI0VdVzjUArrhPESSnOl5p//fl7E3EToj0yho4LiCWAe6FPq2jgLw=="
+                "signature": "MOsS78V4n4UVp1B653w81/llZZIXs9BxHU4hDUKrvNIZ+Yh7x43X5YXosQvo3mW6blI/X79TfBqME5MCXs6TRQ=="
               }
             ],
-            "memo": "8227b91d706b6d09093bb261af3e5bea1dc903ce@192.168.1.138:26656"
+            "memo": "bcc24e6876cf6fa23ed8bde4ddde5ec3e84002a7@192.168.1.138:26656"
           }
         }
       ]
     },
-    "requestchain": {},
-    "distr": {
+    "params": null,
+    "accounts": [
+      {
+        "address": "cosmos173renhx6vx5fazhqyz5hjj7nfecpa450gyskwd",
+        "coins": [
+          {
+            "denom": "stake",
+            "amount": "100000000"
+          }
+        ],
+        "sequence_number": "0",
+        "account_number": "0",
+        "original_vesting": [],
+        "delegated_free": [],
+        "delegated_vesting": [],
+        "start_time": "0",
+        "end_time": "0",
+        "module_name": "",
+        "module_permissions": [
+          ""
+        ]
+      },
+      {
+        "address": "cosmos1xnvwlt8zh6s0gg9vnxw2yj2vxdn070kt7v9akf",
+        "coins": [
+          {
+            "denom": "stake",
+            "amount": "100000000"
+          }
+        ],
+        "sequence_number": "0",
+        "account_number": "0",
+        "original_vesting": [],
+        "delegated_free": [],
+        "delegated_vesting": [],
+        "start_time": "0",
+        "end_time": "0",
+        "module_name": "",
+        "module_permissions": [
+          ""
+        ]
+      }
+    ],
+    "staking": {
+      "params": {
+        "unbonding_time": "1814400000000000",
+        "max_validators": 100,
+        "max_entries": 7,
+        "bond_denom": "stake"
+      },
+      "last_total_power": "0",
+      "last_validator_powers": null,
+      "validators": null,
+      "delegations": null,
+      "unbonding_delegations": null,
+      "redelegations": null,
+      "exported": false
+    },
+    "distribution": {
       "fee_pool": {
         "community_pool": []
       },
@@ -163,6 +153,22 @@
       "validator_current_rewards": [],
       "delegator_starting_infos": [],
       "validator_slash_events": []
+    },
+    "auth": {
+      "params": {
+        "max_memo_characters": "256",
+        "tx_sig_limit": "7",
+        "tx_size_cost_per_byte": "10",
+        "sig_verify_cost_ed25519": "590",
+        "sig_verify_cost_secp256k1": "1000"
+      }
+    },
+    "requestchain": {},
+    "bank": {
+      "send_enabled": true
+    },
+    "supply": {
+      "supply": []
     }
   }
 }
