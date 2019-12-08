@@ -69,15 +69,15 @@ func CustomAnteHandler(ak auth.AccountKeeper, supplyKeeper authtypes.SupplyKeepe
 		signBytes := auth.GetSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
 		stdSigs := stdTx.GetSignatures()
 
-		// Set public key to signer if it doesn't exist
-		pubKey, res := auth.ProcessPubKey(signerAcc, stdSigs[0], sim)
-		if !res.IsOK() {
-			return newCtx, res, true
-		}
-		err := signerAcc.SetPubKey(pubKey)
-		if err != nil {
-			return newCtx, sdk.ErrInternal("failed to set PubKey on signer account").Result(), true
-		}
+		// // Set public key to signer if it doesn't exist
+		// pubKey, res := auth.ProcessPubKey(signerAcc, stdSigs[0], sim)
+		// if !res.IsOK() {
+		// 	return newCtx, res, true
+		// }
+		// err := signerAcc.SetPubKey(pubKey)
+		// if err != nil {
+		// 	return newCtx, sdk.ErrInternal("failed to set PubKey on signer account").Result(), true
+		// }
 
 		if !sim && !pubKey.VerifyBytes(signBytes, stdSigs[0].Signature) {
 			return newCtx, sdk.ErrUnauthorized("signature verification failed").Result(), true
