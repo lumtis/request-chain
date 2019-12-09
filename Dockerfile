@@ -1,7 +1,15 @@
 FROM golang:latest
 ENV GOPATH /go
-WORKDIR /go/src/github.com/ltacker
-RUN git clone https://github.com/ltacker/request-chain.git
+
+# Copy files
+ADD Makefile /go/src/github.com/ltacker/request-chain/Makefile
+ADD Makefile.ledger /go/src/github.com/ltacker/request-chain/Makefile.ledger
+ADD go.mod /go/src/github.com/ltacker/request-chain/go.mod
+ADD app.go /go/src/github.com/ltacker/request-chain/app.go
+ADD x /go/src/github.com/ltacker/request-chain/x
+ADD utils /go/src/github.com/ltacker/request-chain/utils
+ADD cmd /go/src/github.com/ltacker/request-chain/cmd
+
 WORKDIR /go/src/github.com/ltacker/request-chain
 
 RUN make install
@@ -29,5 +37,3 @@ RUN chmod +x importPierre
 RUN chmod +x importPerrine
 RUN /usr/bin/expect -f importPierre
 RUN /usr/bin/expect -f importPerrine
-
-# ENTRYPOINT ["rcd", "start"]
