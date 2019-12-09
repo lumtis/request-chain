@@ -64,6 +64,25 @@ func CustomAnteHandler(ak auth.AccountKeeper, supplyKeeper authtypes.SupplyKeepe
 			return newCtx, res, true
 		}
 
+		// Verify signature
+		isGenesis := newCtx.BlockHeight() == 0
+		signBytes := auth.GetSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
+		stdSigs := stdTx.GetSignatures()
+
+		// Set public key to signer if it doesn't exist
+		pubKey, res := auth.ProcessPubKey(signerAcc, stdSigs[0], sim)
+		if !res.IsOK() {
+			return newCtx, res, true
+		}
+		err := signerAcc.SetPubKey(pubKey)
+		if err != nil {
+			return newCtx, sdk.ErrInternal("failed to set PubKey on signer account").Result(), true
+		}
+
+		if !sim && !pubKey.VerifyBytes(signBytes, stdSigs[0].Signature) {
+			return newCtx, sdk.ErrUnauthorized("signature verification failed").Result(), true
+		}
+
 		// Deduct fee
 		blockTime := newCtx.BlockHeader().Time
 		coins := signerAcc.GetCoins()
@@ -76,7 +95,7 @@ func CustomAnteHandler(ak auth.AccountKeeper, supplyKeeper authtypes.SupplyKeepe
 			return newCtx, sdk.ErrInternal(fmt.Sprintf("invalid fee amount: %s", fee)).Result(), true
 		}
 
-		// verify the account has enough funds to pay for fee
+		// Verify the account has enough funds to pay for fee
 		_, hasNeg := coins.SafeSub(fee)
 		if hasNeg {
       // sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fee; %s < %s", coins, fee)
@@ -91,15 +110,22 @@ func CustomAnteHandler(ak auth.AccountKeeper, supplyKeeper authtypes.SupplyKeepe
 			return newCtx, sdk.ErrInternal(fmt.Sprintf("insufficient spendable funds to pay for fee; %s < %s", spendableCoins, fee)).Result(), true
 		}
 
-		// the first signer pays the transaction fees
+		// The first signer pays the transaction fees
 		res = auth.DeductFees(supplyKeeper, newCtx, signerAcc, fee)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
 
-		err := supplyKeeper.SendCoinsFromAccountToModule(newCtx, signerAcc.GetAddress(), authtypes.FeeCollectorName, fee)
+		// Send coins to fee collector
+		err = supplyKeeper.SendCoinsFromAccountToModule(newCtx, signerAcc.GetAddress(), authtypes.FeeCollectorName, fee)
 		if err != nil {
 			return newCtx, sdk.ErrInternal(fmt.Sprintf("insufficient spendable funds to pay for fee")).Result(), true
+		}
+
+		// Increment sequence
+		errSequence := signerAcc.SetSequence(signerAcc.GetSequence() + 1)
+		if errSequence != nil {
+			return newCtx, sdk.ErrInternal(fmt.Sprintf("impossible to increment sequence")).Result(), true
 		}
 
 		ak.SetAccount(newCtx, signerAcc)
