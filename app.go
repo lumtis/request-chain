@@ -23,7 +23,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+
 	"github.com/ltacker/request-chain/x/requestchain"
+	"github.com/ltacker/request-chain/x/ethbridge"
+	"github.com/ltacker/request-chain/x/oracle"
 )
 
 const appName = "requestchain"
@@ -49,6 +52,7 @@ var (
 		supply.AppModuleBasic{},
 
 		requestchain.AppModule{},
+		ethbridge.AppModuleBasic{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
@@ -56,6 +60,7 @@ var (
 		distr.ModuleName:          nil,
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
+		ethbridge.ModuleName:      {supply.Burner, supply.Minter},
 	}
 )
 
@@ -84,7 +89,13 @@ type requestChainApp struct {
 	distrKeeper         distr.Keeper
 	supplyKeeper   			supply.Keeper
 	paramsKeeper        params.Keeper
+
+	// Request chain keeper
 	rcKeeper            requestchain.Keeper
+
+	// EthBridge keepers
+	BridgeKeeper ethbridge.Keeper
+	OracleKeeper oracle.Keeper
 
 	// Module Manager
 	mm *module.Manager
