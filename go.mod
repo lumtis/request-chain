@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/cosmos/cosmos-sdk v0.37.4
-	github.com/cosmos/sdk-tutorials/nameservice v0.0.0-20191129110419-f2591a6fc9e6
+	github.com/ethereum/go-ethereum v1.9.9
 	github.com/gorilla/mux v1.7.3
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.5.0

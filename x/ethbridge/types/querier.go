@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cosmos/peggy/x/oracle"
+	"github.com/ltacker/request-chain/x/oracle"
 )
 
 // QueryEthProphecyParams defines the params for the following queries:

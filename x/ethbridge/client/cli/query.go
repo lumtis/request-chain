@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cosmos/peggy/x/ethbridge/querier"
-	"github.com/cosmos/peggy/x/ethbridge/types"
+	"github.com/ltacker/request-chain/x/ethbridge/querier"
+	"github.com/ltacker/request-chain/x/ethbridge/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client/context"

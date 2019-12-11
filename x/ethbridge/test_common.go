@@ -8,9 +8,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/cosmos/peggy/x/ethbridge/types"
-	oracle "github.com/cosmos/peggy/x/oracle"
-	keeperLib "github.com/cosmos/peggy/x/oracle/keeper"
+	"github.com/ltacker/request-chain/x/ethbridge/types"
+	oracle "github.com/ltacker/request-chain/x/oracle"
+	keeperLib "github.com/ltacker/request-chain/x/oracle/keeper"
 )
 
 func CreateTestHandler(t *testing.T, consensusNeeded float64, validatorAmounts []int64) (sdk.Context, oracle.Keeper, bank.Keeper, supply.Keeper, auth.AccountKeeper, []sdk.ValAddress, sdk.Handler) {

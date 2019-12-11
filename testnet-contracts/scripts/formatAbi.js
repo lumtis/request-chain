@@ -16,7 +16,7 @@ function writeABIs(contracts) {
     // Set up contract instance using build.json
     const ContractInstance = require(contracts[i].inPath);
 
-    // Write the contract's ABI to ebrelayer/contract/abi
+    // Write the contract's ABI to rcrelayer/contract/abi
     fs.writeFile(
       contracts[i].outPath,
       JSON.stringify(ContractInstance.abi),
@@ -32,16 +32,16 @@ function writeABIs(contracts) {
  *** Set up contracts
  ******************************************/
 const VALSET_IN_PATH = "../build/contracts/Valset.json";
-const VALSET_OUT_PATH = "../cmd/ebrelayer/contract/abi/Valset.abi";
+const VALSET_OUT_PATH = "../cmd/rcrelayer/contract/abi/Valset.abi";
 
 const ORACLE_IN_PATH = "../build/contracts/Oracle.json";
-const ORACLE_OUT_PATH = "../cmd/ebrelayer/contract/abi/Oracle.abi";
+const ORACLE_OUT_PATH = "../cmd/rcrelayer/contract/abi/Oracle.abi";
 
 const COSMOS_BRIDGE_IN_PATH = "../build/contracts/CosmosBridge.json";
-const COSMOS_BRIDGE_OUT_PATH = "../cmd/ebrelayer/contract/abi/CosmosBridge.abi";
+const COSMOS_BRIDGE_OUT_PATH = "../cmd/rcrelayer/contract/abi/CosmosBridge.abi";
 
 const BRIDGE_BANK_IN_PATH = "../build/contracts/BridgeBank.json";
-const BRIDGE_BANK_OUT_PATH = "../cmd/ebrelayer/contract/abi/BridgeBank.abi";
+const BRIDGE_BANK_OUT_PATH = "../cmd/rcrelayer/contract/abi/BridgeBank.abi";
 
 /*******************************************
  *** Write

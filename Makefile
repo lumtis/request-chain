@@ -4,6 +4,7 @@ all: lint install
 install: go.sum
 		go install $(BUILD_FLAGS) ./cmd/rcd
 		go install $(BUILD_FLAGS) ./cmd/rccli
+		go install $(BUILD_FLAGS) ./cmd/rcrelayer
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"

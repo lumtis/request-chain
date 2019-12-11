@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cosmos/peggy/x/ethbridge/types"
+	"github.com/ltacker/request-chain/x/ethbridge/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 

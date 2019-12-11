@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/cosmos/peggy/x/ethbridge/types"
-	"github.com/cosmos/peggy/x/oracle"
-	keeperLib "github.com/cosmos/peggy/x/oracle/keeper"
+	"github.com/ltacker/request-chain/x/ethbridge/types"
+	"github.com/ltacker/request-chain/x/oracle"
+	keeperLib "github.com/ltacker/request-chain/x/oracle/keeper"
 )
 
 const (

@@ -6,7 +6,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/cosmos/peggy/x/oracle/types"
+	"github.com/ltacker/request-chain/x/oracle/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 

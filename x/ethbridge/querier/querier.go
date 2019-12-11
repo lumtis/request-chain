@@ -3,8 +3,8 @@ package querier
 import (
 	"strconv"
 
-	"github.com/cosmos/peggy/x/ethbridge/types"
-	oracletypes "github.com/cosmos/peggy/x/oracle/types"
+	"github.com/ltacker/request-chain/x/ethbridge/types"
+	oracletypes "github.com/ltacker/request-chain/x/oracle/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"

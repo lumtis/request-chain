@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/peggy/x/oracle"
+	"github.com/ltacker/request-chain/x/oracle"
 )
 
 // EthBridgeClaim is a structure that contains all the data for a particular bridge claim

@@ -12,8 +12,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/cosmos/peggy/x/ethbridge/querier"
-	"github.com/cosmos/peggy/x/ethbridge/types"
+	"github.com/ltacker/request-chain/x/ethbridge/querier"
+	"github.com/ltacker/request-chain/x/ethbridge/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

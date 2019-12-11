@@ -39,4 +39,4 @@ Then, you can create and update request with [request-client.js](https://github.
 
 ### IN PROGRESS
 
-- Implementing Pegzone for ERC20 to allows usage of the REQ token to pay fees (https://github.com/cosmos/peggy)
+- Implementing Pegzone for ERC20 to allows usage of the REQ token to pay fees (https://github.com/ltacker/request-chain)
