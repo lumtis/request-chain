@@ -87,7 +87,7 @@ func CustomAnteHandler(ak auth.AccountKeeper, supplyKeeper authtypes.SupplyKeepe
 		blockTime := newCtx.BlockHeader().Time
 		coins := signerAcc.GetCoins()
 
-		costCoin := sdk.NewInt64Coin("stake", int64(cost))
+		costCoin := sdk.NewInt64Coin("rct", int64(cost))
 		fee := sdk.Coins([]sdk.Coin{costCoin})
 
 		if !fee.IsValid() {

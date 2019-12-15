@@ -1,0 +1,9 @@
+set timeout 10
+spawn rccli keys import alice keysfileAlice
+expect "Enter passphrase to decrypt your key:\r"
+send -- "hahahaha\r"
+expect eof
+spawn rccli keys import bob keysfileBob
+expect "Enter passphrase to decrypt your key:\r"
+send -- "hahahaha\r"
+expect eof

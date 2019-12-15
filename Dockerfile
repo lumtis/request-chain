@@ -29,11 +29,8 @@ RUN rccli config chain-id wacken
 RUN rccli config node rcd:26657
 
 # Import the private key into cli to sign transactions
-ADD utils/keysfilePierre /go/src/github.com/ltacker/request-chain
-ADD utils/importPierre /go/src/github.com/ltacker/request-chain
-ADD utils/keysfilePerrine /go/src/github.com/ltacker/request-chain
-ADD utils/importPerrine /go/src/github.com/ltacker/request-chain
-RUN chmod +x importPierre
-RUN chmod +x importPerrine
-RUN /usr/bin/expect -f importPierre
-RUN /usr/bin/expect -f importPerrine
+ADD utils/keysfileAlice /go/src/github.com/ltacker/request-chain
+ADD utils/keysfileBob /go/src/github.com/ltacker/request-chain
+ADD utils/importKeys /go/src/github.com/ltacker/request-chain
+RUN chmod +x importKeys
+RUN /usr/bin/expect -f importKeys
