@@ -1,4 +1,6 @@
-![Request Chain](requestChain.png)
+<p align="center">
+  <img width="200" height="200" src="requestChain.png">
+</p>
 
 # Request Chain
 
